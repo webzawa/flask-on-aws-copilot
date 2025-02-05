@@ -13,6 +13,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # アプリケーションのコードをコンテナにコピー
 COPY . .
 
+# 環境変数を設定して開発モードを有効にする
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+
 # コンテナがリッスンするポートを指定
 EXPOSE 5000
 
