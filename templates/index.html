@@ -31,14 +31,14 @@
     <div class="todo-list">
         {% for todo in todos %}
         <div class="todo-item">
-            <form action="{{ url_for('update_todo', todo_id=todo.id) }}" method="POST" style="display: inline;">
-                <input type="checkbox" onChange="this.form.submit()" {% if todo.completed %}checked{% endif %}>
+            <form action="{{ url_for('update_todo', todo_id=todo['id']) }}" method="POST" style="display: inline;">
+                <input type="checkbox" onChange="this.form.submit()" {% if todo['completed'] %}checked{% endif %}>
             </form>
-            <span class="{% if todo.completed %}completed{% endif %}">
-                {{ todo.title }}
+            <span class="{% if todo['completed'] %}completed{% endif %}">
+                {{ todo['title'] }}
             </span>
-            <small>{{ todo.created_at }}</small>
-            <form action="{{ url_for('delete_todo', todo_id=todo.id) }}" method="POST" style="display: inline;">
+            <small>{{ todo['created_at'] }}</small>
+            <form action="{{ url_for('delete_todo', todo_id=todo['id']) }}" method="POST" style="display: inline;">
                 <button type="submit">削除</button>
             </form>
         </div>
