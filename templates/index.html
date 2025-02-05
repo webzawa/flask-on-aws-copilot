@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello, World!</title>
+    <title>Todoリスト</title>
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .todo-form {
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <h1>Todoリスト</h1>
+
+    <form class="todo-form" action="{{ url_for('create_todo') }}" method="POST">
+        <input type="text" name="title" placeholder="新しいタスクを入力" required>
+        <button type="submit">追加</button>
+    </form>
+
+    <div class="todo-list">
+        {% for todo in todos %}
+        <div class="todo-item">
+            <form action="{{ url_for('update_todo', todo_id=todo['id']) }}" method="POST" style="display: inline;">
+                <input type="checkbox" onChange="this.form.submit()" {% if todo['completed'] %}checked{% endif %}>
+            </form>
+            <span class="{% if todo['completed'] %}completed{% endif %}">
+                {{ todo['title'] }}
+            </span>
+            <small>{{ todo['created_at'] }}</small>
+            <form action="{{ url_for('delete_todo', todo_id=todo['id']) }}" method="POST" style="display: inline;">
+                <button type="submit">削除</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

@@ -13,12 +13,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # アプリケーションのコードをコンテナにコピー
 COPY . .
 
-# 環境変数を設定して開発モードを有効にする
+# データベース用のディレクトリを作成
+RUN mkdir -p /app/data
+
+# 環境変数を設定
 ENV FLASK_ENV=development
 ENV FLASK_DEBUG=1
+ENV DATABASE_PATH=/app/data/todos.db
 
 # コンテナがリッスンするポートを指定
 EXPOSE 5000
 
 # アプリケーションの起動コマンド
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["python", "app.py"]
