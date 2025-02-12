@@ -2,8 +2,21 @@ from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import sqlite3
 import os
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+# ユーザー情報（本来はデータベースで管理すべき）
+users = {"admin": generate_password_hash("secret")}
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username), password):
+        return username
+
 
 # データベースパスを環境変数から取得（デフォルト値付き）
 DATABASE_PATH = os.getenv("DATABASE_PATH", "data/todos.db")
@@ -37,15 +50,17 @@ def get_db():
 
 
 @app.route("/")
+@auth.login_required
 def index():
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM todos ORDER BY created_at DESC")
         todos = cursor.fetchall()
-    return render_template("index.html", todos=todos)
+    return render_template("index.html", todos=todos, username=auth.current_user())
 
 
 @app.route("/todo/create", methods=["POST"])
+@auth.login_required
 def create_todo():
     title = request.form.get("title")
     if title:
@@ -60,6 +75,7 @@ def create_todo():
 
 
 @app.route("/todo/<int:todo_id>/update", methods=["POST"])
+@auth.login_required
 def update_todo(todo_id):
     with get_db() as conn:
         cursor = conn.cursor()
@@ -75,6 +91,7 @@ def update_todo(todo_id):
 
 
 @app.route("/todo/<int:todo_id>/delete", methods=["POST"])
+@auth.login_required
 def delete_todo(todo_id):
     with get_db() as conn:
         cursor = conn.cursor()
@@ -84,8 +101,9 @@ def delete_todo(todo_id):
 
 
 @app.route("/sample")
+@auth.login_required
 def sample():
-    return render_template("sample.html")
+    return render_template("sample.html", username=auth.current_user())
 
 
 # アプリケーション起動時にデータベースを初期化
